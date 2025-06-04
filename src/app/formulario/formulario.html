@@ -1,11 +1,10 @@
-<div class="min-h-screen flex items-center justify-center" 
-     style="background-image: url('/fondo.avif'); 
-            background-size: cover; 
-            background-position: center; 
+<div class="min-h-screen flex items-center justify-center"
+     style="background-image: url('/fondo.avif');
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;">
   <div class="bg-white rounded-lg shadow-md w-full max-w-6xl grid md:grid-cols-12">
 
-    <!-- Panel izquierdo -->
     <div class="md:col-span-4 bg-gradient-to-br from-sky-500 to-blue-700 text-white rounded-l-lg p-10 flex flex-col justify-between animate-fade-in">
       <div>
         <h2 class="text-4xl font-extrabold mb-6 leading-tight">
@@ -21,55 +20,81 @@
       </p>
     </div>
 
-    <!-- Formulario -->
-    <form id="registroForm" action="https://fabform.io/f/{form-id}" method="post" 
-          class="md:col-span-8 p-10 rounded-lg border-2" 
+    <form id="registroForm"
+          (ngSubmit)="onSubmit()" #registrationForm="ngForm"
+          class="md:col-span-8 p-10 rounded-lg border-2"
           style="border-color: #a7c4c4; ">
-      
-      <!-- Nombre y Apellido -->
+
+      <div *ngIf="message" [ngClass]="isSuccess ? 'text-green-700 bg-green-100 border border-green-400' : 'text-red-700 bg-red-100 border border-red-400'"
+           class="px-4 py-3 rounded relative mb-4">
+        <strong class="font-bold">¡Atención!</strong>
+        <span class="block sm:inline ml-2">{{ message }}</span>
+      </div>
+
+      <div *ngIf="isLoading" class="text-center text-sky-600 font-bold mb-4">
+        Cargando...
+      </div>
+
+      <h3 class="text-2xl font-bold mb-6 text-gray-800">Registrar Nuevo Cliente</h3>
+
       <div class="flex flex-wrap -mx-3 mb-6">
         <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="nombres">
             Nombre/s
           </label>
-          <input id="nombres" name="nombres" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
-            title="Solo letras y espacios permitidos"
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="text" placeholder="Su nombre/s">
+          <input id="nombres" name="nombres"
+                 [(ngModel)]="formData.nombres"
+                 required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                 title="Solo letras y espacios permitidos"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="text" placeholder="Su nombre/s">
+          <div *ngIf="registrationForm.controls['nombres']?.invalid && (registrationForm.controls['nombres']?.dirty || registrationForm.controls['nombres']?.touched)" class="text-red-500 text-xs italic mt-2">
+            El nombre es obligatorio y solo debe contener letras y espacios.
+          </div>
         </div>
         <div class="w-full md:w-1/2 px-3">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="apellidos">
             Apellido/s
           </label>
-          <input id="apellidos" name="apellidos" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
-            title="Solo letras y espacios permitidos"
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="text" placeholder="Su apellido/s">
+          <input id="apellidos" name="apellidos"
+                 [(ngModel)]="formData.apellidos"
+                 required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                 title="Solo letras y espacios permitidos"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="text" placeholder="Su apellido/s">
+          <div *ngIf="registrationForm.controls['apellidos']?.invalid && (registrationForm.controls['apellidos']?.dirty || registrationForm.controls['apellidos']?.touched)" class="text-red-500 text-xs italic mt-2">
+            El apellido es obligatorio y solo debe contener letras y espacios.
+          </div>
         </div>
       </div>
 
-      <!-- Correo -->
       <div class="flex flex-wrap -mx-3 mb-6">
         <div class="w-full px-3">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="correo">
             Correo Electrónico
           </label>
-          <input id="correo" name="correo" required
-            pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$" 
-            title="Debe ser un correo válido de Gmail o Hotmail"
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="email" placeholder="ejemplo@gmail.com">
+          <input id="correo" name="correo"
+                 [(ngModel)]="formData.correo"
+                 required
+                 pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$"
+                 title="Debe ser un correo válido de Gmail o Hotmail"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="email" placeholder="ejemplo@gmail.com">
+          <div *ngIf="registrationForm.controls['correo']?.invalid && (registrationForm.controls['correo']?.dirty || registrationForm.controls['correo']?.touched)" class="text-red-500 text-xs italic mt-2">
+            Debe ser un correo válido de Gmail o Hotmail.
+          </div>
         </div>
       </div>
 
-      <!-- Tipo de documento y número -->
       <div class="flex flex-wrap -mx-3 mb-6">
         <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="tipoDocumento">
             Tipo de Documento
           </label>
-          <select id="tipoDocumento" name="tipoDocumento" required
-            class="appearance-none transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 pr-10 leading-tight w-full">
+          <select id="tipoDocumento" name="tipoDocumento"
+                  [(ngModel)]="formData.tipoDocumento"
+                  required
+                  class="appearance-none transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 pr-10 leading-tight w-full">
             <option value="">Seleccione una opción</option>
             <option value="cc">Cédula de Ciudadanía</option>
             <option value="ti">Tarjeta de Identidad</option>
@@ -77,96 +102,146 @@
             <option value="ce">Cédula de Extranjería</option>
             <option value="pa">Pasaporte</option>
           </select>
+          <div *ngIf="registrationForm.controls['tipoDocumento']?.invalid && (registrationForm.controls['tipoDocumento']?.dirty || registrationForm.controls['tipoDocumento']?.touched)" class="text-red-500 text-xs italic mt-2">
+            Debe seleccionar un tipo de documento.
+          </div>
         </div>
 
         <div class="w-full md:w-1/2 px-3">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="numeroDocumento">
             Número de Identidad
           </label>
-          <input id="numeroDocumento" name="numeroDocumento" required
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="text" placeholder="XXXXXXXXXX" maxlength="10" pattern="\d+"
-            title="Solo números">
+          <input id="numeroDocumento" name="numeroDocumento"
+                 [(ngModel)]="formData.numeroDocumento"
+                 required
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="text" placeholder="XXXXXXXXXX"  pattern="\d+"
+                 title="Solo números">
+          <div *ngIf="registrationForm.controls['numeroDocumento']?.invalid && (registrationForm.controls['numeroDocumento']?.dirty || registrationForm.controls['numeroDocumento']?.touched)" class="text-red-500 text-xs italic mt-2">
+            El número de documento es obligatorio y solo debe contener números.
+          </div>
         </div>
       </div>
 
-      <!-- Teléfono y Contraseña -->
       <div class="flex flex-wrap -mx-3 mb-6">
-        <!-- Número Telefónico -->
         <div class="w-full md:w-2/4 px-3 mb-6 md:mb-0">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="telefono">
             Número Telefónico
           </label>
-          <input id="telefono" name="telefono" required
-            pattern="^\d{10}$" title="Debe contener exactamente 10 dígitos"
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="tel" placeholder="3XXXXXXXXX" maxlength="10">
+          <input id="telefono" name="telefono"
+                 [(ngModel)]="formData.telefono"
+                 required
+                 pattern="^\d{10}$" title="Debe contener exactamente 10 dígitos"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="tel" placeholder="3XXXXXXXXX" maxlength="10">
+          <div *ngIf="registrationForm.controls['telefono']?.invalid && (registrationForm.controls['telefono']?.dirty || registrationForm.controls['telefono']?.touched)" class="text-red-500 text-xs italic mt-2">
+            El número telefónico es obligatorio y debe contener exactamente 10 dígitos.
+          </div>
         </div>
 
-        <!-- Contraseña -->
         <div class="w-full md:w-2/4 px-3">
           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="password">
             Contraseña
           </label>
-          <input id="password" name="password" required
-            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-            title="Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos"
-            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-            type="password" placeholder="********">
+          <input id="password" name="password"
+                 [(ngModel)]="formData.password"
+                 required
+                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
+                 title="Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="password" placeholder="********">
+          <div *ngIf="registrationForm.controls['password']?.invalid && (registrationForm.controls['password']?.dirty || registrationForm.controls['password']?.touched)" class="text-red-500 text-xs italic mt-2">
+            Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos.
+          </div>
         </div>
       </div>
 
-      <!-- Checkbox y botón -->
-<div class="flex flex-col w-full px-3 mb-6 items-center">
-  <label class="block text-gray-500 font-bold flex-1 mb-4">
-    <input required class="mr-2 leading-tight" type="checkbox" id="privacyPolicy">
-    <span class="text-sm">
-      Autorizo el tratamiento de mis datos personales conforme a la política de privacidad y los términos establecidos.
-    </span>
-  </label>
-  <button class="transition-all duration-300 transform hover:scale-105 shadow bg-sky-600 hover:bg-sky-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mb-4"
-    type="submit">
-    Registrarse
-  </button>
-  <p class="text-sm text-gray-700">
-    ¿Ya tienes una cuenta? 
-    <button 
-                (click)="goToLogin()" 
-                 class="text-sky-500 hover:underline font-medium transition duration-200">
-                 Ingresa aquí.
-              </button>
-  </p>
-</div>
-
+      <div class="flex flex-col w-full px-3 mb-6 items-center">
+        <label class="block text-gray-500 font-bold flex-1 mb-4">
+          <input name="privacyPolicy" id="privacyPolicy" [(ngModel)]="formData.privacyPolicy" required class="mr-2 leading-tight" type="checkbox">
+          <span class="text-sm">
+            Autorizo el tratamiento de mis datos personales conforme a la política de privacidad y los términos establecidos.
+          </span>
+        </label>
+        <button class="transition-all duration-300 transform hover:scale-105 shadow bg-sky-600 hover:bg-sky-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mb-4"
+                type="submit" [disabled]="registrationForm.invalid || isLoading">
+          Registrarse
+        </button>
+        <p class="text-sm text-gray-700">
+          ¿Ya tienes una cuenta?
+          <button (click)="goToLogin()" class="text-sky-500 hover:underline font-medium transition duration-200">
+            Ingresa aquí.
+          </button>
+        </p>
+      </div>
     </form>
+
+    <hr class="md:col-span-12 my-6">
+
+    <div class="md:col-span-12 p-10 pt-0">
+        <h3 class="text-2xl font-bold mb-6 text-gray-800">Administrar Cliente (Buscar, Actualizar, Eliminar)</h3>
+        <div class="flex flex-wrap -mx-3 mb-6 items-end">
+            <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="searchNumeroDocumento">
+                    Buscar por Número de Identidad
+                </label>
+                <input id="searchNumeroDocumento" name="searchNumeroDocumento"
+                       [(ngModel)]="searchNumeroDocumento"
+                       class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                       type="text" placeholder="Ingrese número de documento" maxlength="10" pattern="\d+"
+                       title="Solo números">
+            </div>
+            <div class="w-full md:w-1/3 px-3">
+                <button (click)="searchClient()" [disabled]="isLoading || !searchNumeroDocumento"
+                        class="transition-all duration-300 transform hover:scale-105 shadow bg-blue-600 hover:bg-blue-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded w-full md:w-auto">
+                    Buscar Cliente
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="foundRecord" class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+            <h4 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Cliente Encontrado:</h4>
+            <p class="text-gray-700 mb-2"><strong>Nombre:</strong> {{ foundRecord.nombres }}</p>
+            <p class="text-gray-700 mb-2"><strong>Apellido:</strong> {{ foundRecord.apellidos }}</p>
+            <p class="text-gray-700 mb-2"><strong>Correo:</strong> {{ foundRecord.correo }}</p>
+            <p class="text-gray-700 mb-2"><strong>Tipo Documento:</strong> {{ foundRecord.tipoDocumento | uppercase }}</p>
+            <p class="text-gray-700 mb-2"><strong>Número Documento:</strong> {{ foundRecord.numeroDocumento }}</p>
+            <p class="text-gray-700 mb-4"><strong>Teléfono:</strong> {{ foundRecord.telefono }}</p>
+
+            <div class="flex space-x-4">
+                <button (click)="updateClient()" [disabled]="isLoading"
+                        class="transition-all duration-300 transform hover:scale-105 shadow bg-green-600 hover:bg-green-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded">
+                    Actualizar Datos
+                </button>
+                <button (click)="deleteClient()" [disabled]="isLoading"
+                        class="transition-all duration-300 transform hover:scale-105 shadow bg-red-600 hover:bg-red-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded">
+                    Eliminar Cliente
+                </button>
+            </div>
+        </div>
+    </div>
   </div>
 </div>
 
 <script>
-  const form = document.getElementById('registroForm');
-  const tipoDocumento = document.getElementById('tipoDocumento');
-  const numeroDocumento = document.getElementById('numeroDocumento');
+    // const form = document.getElementById('registroForm'); // Ya no se necesita
+    // const tipoDocumento = document.getElementById('tipoDocumento'); // Ya no se necesita
+    // const numeroDocumento = document.getElementById('numeroDocumento'); // Ya no se necesita
 
-  form.addEventListener('submit', function(event) {
-    const tipo = tipoDocumento.value;
-    const numero = numeroDocumento.value.trim();
+    // form.addEventListener('submit', function(event) { // Esto es manejado por (ngSubmit)="onSubmit()"
+    //   const tipo = tipoDocumento.value;
+    //   const numero = numeroDocumento.value.trim();
 
-    // Para los tipos con restricción de 10 dígitos
-    const tiposCon10Digitos = ['cc', 'ti', 'rc', 'ce'];
+    //   const tiposCon10Digitos = ['cc', 'ti', 'rc', 'ce'];
 
-    if (tiposCon10Digitos.includes(tipo)) {
-      if (!/^\d{10}$/.test(numero)) {
-        alert('El número de documento debe contener exactamente 10 dígitos numéricos para el tipo de documento seleccionado.');
-        numeroDocumento.focus();
-        event.preventDefault();
-        return false;
-      }
-    }
-
-    // Para pasaporte, permitimos cualquier valor, solo que no esté vacío (ya cubierto por required)
-
-    // Validación general del formulario HTML5 se ejecuta automáticamente
-
-    return true; // Permite enviar el formulario si todo está OK
-  });
+    //   if (tiposCon10Digitos.includes(tipo)) {
+    //     if (!/^\d{10}$/.test(numero)) {
+    //       alert('El número de documento debe contener exactamente 10 dígitos numéricos para el tipo de documento seleccionado.');
+    //       numeroDocumento.focus();
+    //       event.preventDefault();
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // });
 </script>
