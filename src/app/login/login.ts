@@ -88,7 +88,7 @@ export class Login {
           this.router.navigate(['/formulario']);
         } else {
           // Si es usuario normal, lo enviamos a una página aún no definida (ej. /user-dashboard)
-          this.router.navigate(['/user-dashboard']); // Necesitarás crear este componente y ruta
+          this.router.navigate(['/principal']); // Necesitarás crear este componente y ruta
         }
 
       } else {
