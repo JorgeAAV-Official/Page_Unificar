@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms'; // Para [(ngModel)] y ngSubmit
 
 // Importaciones de Firestore
 import { Firestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from '@angular/fire/firestore';
-// Quita esta línea: import { db } from '../firebase-config'; // Importa la instancia 'db' que creaste
 
 @Component({
   selector: 'app-formulario',
@@ -27,8 +26,10 @@ export class Formulario {
     tipoDocumento: '',
     numeroDocumento: '',
     telefono: '',
-    password: '', // Aunque esto no se guardará directamente en Firestore para seguridad
-    privacyPolicy: false // Para el checkbox de la política de privacidad
+    password: '',
+    privacyPolicy: false,
+    // ¡NUEVO CAMPO: rol!
+    rol: 'usuario' // Valor predeterminado
   };
 
   // Propiedades para mensajes y estado de carga
@@ -39,6 +40,9 @@ export class Formulario {
   // Propiedad para buscar/actualizar/eliminar por número de documento
   searchNumeroDocumento: string = '';
   foundRecord: any = null; // Para almacenar el registro encontrado
+
+  // Opciones para el campo 'rol'
+  roles = ['usuario', 'administrador']; // Definimos las opciones aquí
 
   constructor(
     private router: Router,
@@ -67,7 +71,7 @@ export class Formulario {
     // Validaciones adicionales antes de enviar a Firebase
     if (!this.formData.nombres || !this.formData.apellidos || !this.formData.correo ||
         !this.formData.tipoDocumento || !this.formData.numeroDocumento ||
-        !this.formData.telefono || !this.formData.password) {
+        !this.formData.telefono || !this.formData.password || !this.formData.rol) { // Añadido !this.formData.rol
       this.message = 'Por favor, complete todos los campos obligatorios.';
       this.isSuccess = false;
       this.isLoading = false;
@@ -90,8 +94,6 @@ export class Formulario {
       return;
     }
 
-    // *** CAMBIO AQUÍ: Eliminada la restricción de 10 dígitos para numeroDocumento ***
-    // Ahora solo valida que sean números y que no esté vacío.
     if (!/^\d+$/.test(this.formData.numeroDocumento)) {
         this.message = 'El número de documento solo debe contener números.';
         this.isSuccess = false;
@@ -99,19 +101,6 @@ export class Formulario {
         return;
     }
 
-    // *** CAMBIO AQUÍ: Eliminada la validación específica para tipos de documento con 10 dígitos ***
-    // Ahora todos los tipos de documento pueden tener cualquier longitud numérica.
-    // const tiposCon10Digitos = ['cc', 'ti', 'rc', 'ce'];
-    // if (tiposCon10Digitos.includes(this.formData.tipoDocumento) && this.formData.numeroDocumento.length !== 10) {
-    //    this.message = 'Para el tipo de documento seleccionado, el número de documento debe tener exactamente 10 dígitos.';
-    //    this.isSuccess = false;
-    //    this.isLoading = false;
-    //    return;
-    // }
-
-    // *** CAMBIO AQUÍ: Eliminada la restricción de 10 dígitos exactos para teléfono ***
-    // Ahora solo valida que sean números y que tenga al menos 7 dígitos (un número de teléfono típico)
-    // Puedes ajustar '7' si necesitas un mínimo o máximo diferente.
     if (!/^\d{7,}$/.test(this.formData.telefono)) {
       this.message = 'El número telefónico solo debe contener números y tener al menos 7 dígitos.';
       this.isSuccess = false;
@@ -126,9 +115,16 @@ export class Formulario {
       return;
     }
 
+    // Validar que el rol sea una de las opciones permitidas
+    if (!this.roles.includes(this.formData.rol)) {
+        this.message = 'El rol seleccionado no es válido.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+    }
+
     try {
       // Verificar si ya existe un usuario con el mismo número de documento
-      // Usa this.firestore en lugar de db
       const q = query(collection(this.firestore, 'clientes'), where('numeroDocumento', '==', this.formData.numeroDocumento));
       const querySnapshot = await getDocs(q);
 
@@ -139,12 +135,6 @@ export class Formulario {
         return;
       }
 
-      // IMPORTANTE: NO GUARDES LA CONTRASEÑA EN TEXTO PLANO EN FIRESTORE.
-      // Para un sistema real de autenticación, usarías Firebase Authentication para manejar usuarios y contraseñas de forma segura.
-      // Aquí, solo estamos mostrando cómo guardar otros datos del formulario.
-      // Si el cliente necesita autenticación, ese es otro módulo de Firebase a implementar.
-
-      // Usa this.firestore en lugar de db
       const docRef = await addDoc(collection(this.firestore, 'clientes'), {
         nombres: this.formData.nombres,
         apellidos: this.formData.apellidos,
@@ -152,8 +142,7 @@ export class Formulario {
         tipoDocumento: this.formData.tipoDocumento,
         numeroDocumento: this.formData.numeroDocumento,
         telefono: this.formData.telefono,
-        // password: this.formData.password // ¡NO HACER ESTO EN PRODUCCIÓN!
-        // timestamp: new Date() // Puedes añadir un timestamp de cuándo se creó
+        rol: this.formData.rol // ¡AQUÍ se guarda el nuevo campo 'rol'!
       });
 
       this.message = `¡Registro exitoso! ID de documento: ${docRef.id}`;
@@ -184,12 +173,10 @@ export class Formulario {
     this.foundRecord = null; // Limpiar registro previo
 
     try {
-      // Usa this.firestore en lugar de db
       const q = query(collection(this.firestore, 'clientes'), where('numeroDocumento', '==', this.searchNumeroDocumento));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Asumiendo que el número de documento es único, tomamos el primer resultado
         const docSnapshot = querySnapshot.docs[0];
         this.foundRecord = { id: docSnapshot.id, ...docSnapshot.data() };
         this.message = 'Cliente encontrado.';
@@ -200,15 +187,16 @@ export class Formulario {
         this.formData.apellidos = this.foundRecord.apellidos;
         this.formData.correo = this.foundRecord.correo;
         this.formData.tipoDocumento = this.foundRecord.tipoDocumento;
-        this.formData.numeroDocumento = this.foundRecord.numeroDocumento; // Mantener la cédula encontrada para el update
+        this.formData.numeroDocumento = this.foundRecord.numeroDocumento;
         this.formData.telefono = this.foundRecord.telefono;
-        this.formData.password = ''; // No cargar la contraseña, solo se usa para registro
-        this.formData.privacyPolicy = true; // Asumir aceptada al editar
+        this.formData.password = '';
+        this.formData.privacyPolicy = true;
+        this.formData.rol = this.foundRecord.rol || 'usuario'; // Precarga el rol, si no existe, por defecto 'usuario'
       } else {
         this.message = 'No se encontró ningún cliente con ese número de documento.';
         this.isSuccess = false;
         this.foundRecord = null;
-        this.resetForm(); // Limpiar el formulario si no se encuentra
+        this.resetForm();
       }
     } catch (e) {
       console.error('Error al buscar cliente: ', e);
@@ -234,14 +222,13 @@ export class Formulario {
 
     // Validaciones antes de actualizar
     if (!this.formData.nombres || !this.formData.apellidos || !this.formData.correo ||
-        !this.formData.tipoDocumento || !this.formData.numeroDocumento || !this.formData.telefono) {
+        !this.formData.tipoDocumento || !this.formData.numeroDocumento || !this.formData.telefono || !this.formData.rol) { // Añadido !this.formData.rol
       this.message = 'Por favor, complete todos los campos obligatorios para actualizar.';
       this.isSuccess = false;
       this.isLoading = false;
       return;
     }
     // Añade el resto de validaciones de formato aquí si es necesario (igual que en onSubmit)
-    // Puedes copiar las validaciones modificadas de numeroDocumento y telefono aquí si este método permite actualizar esos campos.
     if (!/^\d+$/.test(this.formData.numeroDocumento)) {
         this.message = 'El número de documento solo debe contener números.';
         this.isSuccess = false;
@@ -256,19 +243,24 @@ export class Formulario {
       return;
     }
 
+    // Validar que el rol sea una de las opciones permitidas
+    if (!this.roles.includes(this.formData.rol)) {
+        this.message = 'El rol seleccionado no es válido.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+    }
 
     try {
-      // Usa this.firestore en lugar de db
       const docRef = doc(this.firestore, 'clientes', this.foundRecord.id);
       await updateDoc(docRef, {
         nombres: this.formData.nombres,
         apellidos: this.formData.apellidos,
         correo: this.formData.correo,
         tipoDocumento: this.formData.tipoDocumento,
-        numeroDocumento: this.formData.numeroDocumento, // La cédula podría actualizarse si cambia
+        numeroDocumento: this.formData.numeroDocumento,
         telefono: this.formData.telefono,
-        // No actualices la contraseña aquí, debe hacerse a través de Firebase Auth si es necesario.
-        // lastUpdated: new Date() // Opcional: timestamp de última actualización
+        rol: this.formData.rol // ¡AQUÍ se actualiza el nuevo campo 'rol'!
       });
 
       this.message = 'Cliente actualizado exitosamente.';
@@ -303,7 +295,6 @@ export class Formulario {
     this.message = '';
 
     try {
-      // Usa this.firestore en lugar de db
       const docRef = doc(this.firestore, 'clientes', this.foundRecord.id);
       await deleteDoc(docRef);
 
@@ -334,9 +325,8 @@ export class Formulario {
       numeroDocumento: '',
       telefono: '',
       password: '',
-      privacyPolicy: false
+      privacyPolicy: false,
+      rol: 'usuario' // Restablece el rol a su valor predeterminado
     };
-    // No reseteamos searchNumeroDocumento si se usa para buscar antes de eliminar/actualizar.
-    // foundRecord también se resetea en cada operación.
   }
 }
