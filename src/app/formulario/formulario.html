@@ -1,0 +1,172 @@
+<div class="min-h-screen flex items-center justify-center" 
+     style="background-image: url('/fondo.avif'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;">
+  <div class="bg-white rounded-lg shadow-md w-full max-w-6xl grid md:grid-cols-12">
+
+    <!-- Panel izquierdo -->
+    <div class="md:col-span-4 bg-gradient-to-br from-sky-500 to-blue-700 text-white rounded-l-lg p-10 flex flex-col justify-between animate-fade-in">
+      <div>
+        <h2 class="text-4xl font-extrabold mb-6 leading-tight">
+          <span class="text-black">FORMULARIO DE </span>
+          <span class="text-white ">REGISTRO</span>
+        </h2>
+        <p class="text-sm leading-relaxed tracking-wide">
+          Únete a nuestra comunidad y mantente informado con las últimas actualizaciones.
+        </p>
+      </div>
+      <p class="text-xs mt-10 italic text-white/90">
+        Nos importa tu privacidad. Nunca compartiremos tu información.
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    <form id="registroForm" action="https://fabform.io/f/{form-id}" method="post" 
+          class="md:col-span-8 p-10 rounded-lg border-2" 
+          style="border-color: #a7c4c4; ">
+      
+      <!-- Nombre y Apellido -->
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="nombres">
+            Nombre/s
+          </label>
+          <input id="nombres" name="nombres" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
+            title="Solo letras y espacios permitidos"
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="text" placeholder="Su nombre/s">
+        </div>
+        <div class="w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="apellidos">
+            Apellido/s
+          </label>
+          <input id="apellidos" name="apellidos" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$" 
+            title="Solo letras y espacios permitidos"
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="text" placeholder="Su apellido/s">
+        </div>
+      </div>
+
+      <!-- Correo -->
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="correo">
+            Correo Electrónico
+          </label>
+          <input id="correo" name="correo" required
+            pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com)$" 
+            title="Debe ser un correo válido de Gmail o Hotmail"
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="email" placeholder="ejemplo@gmail.com">
+        </div>
+      </div>
+
+      <!-- Tipo de documento y número -->
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="tipoDocumento">
+            Tipo de Documento
+          </label>
+          <select id="tipoDocumento" name="tipoDocumento" required
+            class="appearance-none transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 pr-10 leading-tight w-full">
+            <option value="">Seleccione una opción</option>
+            <option value="cc">Cédula de Ciudadanía</option>
+            <option value="ti">Tarjeta de Identidad</option>
+            <option value="rc">Registro Civil</option>
+            <option value="ce">Cédula de Extranjería</option>
+            <option value="pa">Pasaporte</option>
+          </select>
+        </div>
+
+        <div class="w-full md:w-1/2 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="numeroDocumento">
+            Número de Identidad
+          </label>
+          <input id="numeroDocumento" name="numeroDocumento" required
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="text" placeholder="XXXXXXXXXX" maxlength="10" pattern="\d+"
+            title="Solo números">
+        </div>
+      </div>
+
+      <!-- Teléfono y Contraseña -->
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <!-- Número Telefónico -->
+        <div class="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="telefono">
+            Número Telefónico
+          </label>
+          <input id="telefono" name="telefono" required
+            pattern="^\d{10}$" title="Debe contener exactamente 10 dígitos"
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="tel" placeholder="3XXXXXXXXX" maxlength="10">
+        </div>
+
+        <!-- Contraseña -->
+        <div class="w-full md:w-2/4 px-3">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="password">
+            Contraseña
+          </label>
+          <input id="password" name="password" required
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
+            title="Mínimo 8 caracteres con mayúsculas, minúsculas, números y símbolos"
+            class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+            type="password" placeholder="********">
+        </div>
+      </div>
+
+      <!-- Checkbox y botón -->
+<div class="flex flex-col w-full px-3 mb-6 items-center">
+  <label class="block text-gray-500 font-bold flex-1 mb-4">
+    <input required class="mr-2 leading-tight" type="checkbox" id="privacyPolicy">
+    <span class="text-sm">
+      Autorizo el tratamiento de mis datos personales conforme a la política de privacidad y los términos establecidos.
+    </span>
+  </label>
+  <button class="transition-all duration-300 transform hover:scale-105 shadow bg-sky-600 hover:bg-sky-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mb-4"
+    type="submit">
+    Registrarse
+  </button>
+  <p class="text-sm text-gray-700">
+    ¿Ya tienes una cuenta? 
+    <button 
+                (click)="goToLogin()" 
+                 class="text-sky-500 hover:underline font-medium transition duration-200">
+                 Ingresa aquí.
+              </button>
+  </p>
+</div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('registroForm');
+  const tipoDocumento = document.getElementById('tipoDocumento');
+  const numeroDocumento = document.getElementById('numeroDocumento');
+
+  form.addEventListener('submit', function(event) {
+    const tipo = tipoDocumento.value;
+    const numero = numeroDocumento.value.trim();
+
+    // Para los tipos con restricción de 10 dígitos
+    const tiposCon10Digitos = ['cc', 'ti', 'rc', 'ce'];
+
+    if (tiposCon10Digitos.includes(tipo)) {
+      if (!/^\d{10}$/.test(numero)) {
+        alert('El número de documento debe contener exactamente 10 dígitos numéricos para el tipo de documento seleccionado.');
+        numeroDocumento.focus();
+        event.preventDefault();
+        return false;
+      }
+    }
+
+    // Para pasaporte, permitimos cualquier valor, solo que no esté vacío (ya cubierto por required)
+
+    // Validación general del formulario HTML5 se ejecuta automáticamente
+
+    return true; // Permite enviar el formulario si todo está OK
+  });
+</script>

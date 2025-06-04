@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-gray-300 text-gray-900 flex justify-center" 
+        style="background-image: url('/fondo.avif'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;">
+    
+
+  <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow-lg sm:rounded-lg flex justify-center flex-1">
+    <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+      <div>
+        <img
+          src="/logo.png"
+          class="w-32 mx-auto"
+          alt="Logo"
+        />
+      </div>
+      <div class="mt-12 flex flex-col items-center">
+        <div class="w-full flex-1 mt-8">
+          <div class="mx-auto max-w-xs">
+            <!-- Email -->
+            <input
+                class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                type="email"
+                placeholder="Su Email"
+                required
+            />
+
+            <!-- Password -->
+            <input
+                class="mt-5 transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                type="password"
+                placeholder="Su Contraseña"
+                required
+            />
+
+            <!-- Botón de login -->
+            <button
+              class="mt-6 w-full py-3 font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-500 transition duration-300 ease-in-out flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-sky-400"
+              type="submit"
+            >
+              ACCEDER
+            </button>
+
+            <!-- Autorización -->
+            <p class="mt-5 text-xs text-gray-600 text-center">
+              Autoriza el tratamiento de sus datos personales conforme a la política de privacidad y los términos establecidos.
+            </p>
+
+            <!-- Redirección a registro -->
+            <p class="mt-4 text-sm text-gray-700 text-center">
+              ¿No tienes una cuenta aún? 
+              <button 
+                (click)="goToRegistro()" 
+                 class="text-sky-500 hover:underline font-medium transition duration-200">
+                 Puede registrarse aquí.
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Imagen lateral -->
+    <div class="flex-1 bg-gradient-to-br from-sky-500 to-blue-700 text-white rounded-l-lg p-10 flex flex-col justify-between animate-fade-in hidden lg:flex">
+  <div>
+    <h2 class="text-4xl font-extrabold mb-6 leading-tight text-center">
+      <span class="text-black">INICIO DE </span>
+      <span class="text-white">SESIÓN</span>
+    </h2>
+    <p class="text-sm leading-relaxed tracking-wide">
+      Inicia sesión para continuar y acceder a la plataforma.
+    </p>
+  </div>
+  <p class="text-xs mt-10 italic text-white/90">
+    Nos importa tu privacidad. Nunca compartiremos tu información.
+  </p>
+</div>
+  </div>
+</div>
