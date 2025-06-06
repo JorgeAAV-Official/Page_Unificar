@@ -2,3 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* src/styles.css (o src/styles.scss) */
+
+/* --- Paleta de Colores (coherente con Login/Formulario) --- */
+:root {
+    --sky-600: #0284c7;  /* Azul principal fuerte, como el de tu botón ACCEDER */
+    --sky-500: #0ea5e9;  /* Azul un poco más claro, para hover */
+    --blue-700: #1d4ed8; /* Azul oscuro, como el del degradado del login */
+    --blue-500: #3b82f6; /* Un azul intermedio si se necesita */
+
+    --gray-900: #111827; /* Texto muy oscuro */
+    --gray-700: #374151; /* Texto principal y títulos secundarios */
+    --gray-600: #4b5563; /* Texto para notas o secundario */
+    --gray-300: #d1d5db; /* Fondo gris claro */
+    --gray-100: #f3f4f6; /* Fondo de inputs, muy claro */
+    --white: #ffffff;    /* Blanco puro */
+    --black: #000000;    /* Negro puro */
+
+    --green-700: #047857; /* Mensaje de éxito */
+    --green-100: #d1fae5;
+    --red-700: #b91c1c;  /* Mensaje de error */
+    --red-100: #fee2e2;
+}
+
+/* --- Estilos Globales y Reset Básico --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna y legible */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Asegura que padding y border no aumenten el tamaño final del elemento */
+    color: var(--gray-700); /* Color de texto predeterminado */
+    background-color: var(--gray-300); /* Fondo general, similar a tu login */
+    line-height: 1.6; /* Espaciado de línea para mejor legibilidad */
+    color-scheme: light; /* Asegura un esquema de color claro para la renderización del navegador */
+}
+
+/* Otros estilos globales que puedas tener en tu styles.css */

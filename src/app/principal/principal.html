@@ -1,1 +1,125 @@
-<p>principal works!</p>
+<header class="main-header">
+    <div class="header-content">
+        <h1 class="header-title">CONSTRUYENDO SUEÑOS</h1>
+        <p class="header-subtitle">TRANSFORMANDO VIDAS.</p>
+        
+    </div>
+    <div class="wave">
+        <svg viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            </defs>
+            <g class="parallax">
+                <use href="#gentle-wave" x="48" y="0" class="wave-1"></use>
+                <use href="#gentle-wave" x="48" y="3" class="wave-2"></use>
+                <use href="#gentle-wave" x="48" y="5" class="wave-3"></use>
+            </g>
+        </svg>
+    </div>
+</header>
+
+<section id="features" class="features-section">
+    <div class="container">
+        </div>
+</section>
+
+
+<section id="user-profile" class="user-profile-section">
+    <div class="container">
+        <h2 class="section-title">Mi Perfil</h2>
+
+        <div *ngIf="isLoading" class="loading-message">
+            Cargando su información de perfil...
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+
+        <div class="profile-card" *ngIf="!isLoading && userData">
+            <div class="profile-header">
+                <h3>Información de la Cuenta</h3>
+            </div>
+            <div class="profile-details-grid">
+                <div class="detail-item">
+                    <label>Nombres Completos</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.nombres }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.nombres" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Apellidos Completos</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.apellidos }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.apellidos" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>No. Documento</label>
+                    <p class="detail-value">{{ userData.numeroDocumento }}</p>
+                    </div>
+                <div class="detail-item">
+                    <label>Pasaporte</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.pasaporte || 'N/A' }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.pasaporte" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Número Teléfono</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.telefono }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.telefono" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Número Whatsapp</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.whatsapp }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.whatsapp" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Usuario de Telegram</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.usuarioTelegram }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.usuarioTelegram" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Correo Electrónico</label>
+                    <p class="detail-value">{{ userData.correo }}</p>
+                    </div>
+                <div class="detail-item">
+                    <label>País</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.pais }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.pais" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Departamento</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.departamento }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.departamento" type="text">
+                </div>
+                <div class="detail-item">
+                    <label>Ciudad</label>
+                    <p class="detail-value" *ngIf="!isEditing">{{ userData.ciudad }}</p>
+                    <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.ciudad" type="text">
+                </div>
+                </div>
+
+            <div class="profile-actions">
+                <ng-container *ngIf="!isEditing">
+                    <button class="btn btn-primary" (click)="enableEditing()">Actualizar Información</button>
+                    <button class="btn btn-outline" (click)="logout()">Cerrar Sesión</button>
+                </ng-container>
+
+                <ng-container *ngIf="isEditing">
+                    <button class="btn btn-primary" (click)="saveProfileChanges()">Confirmar Cambios</button>
+                    <button class="btn btn-outline" (click)="cancelEditing()">Cancelar</button>
+                </ng-container>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && !userData && !errorMessage" class="no-user-message">
+            No hay información de perfil disponible.
+        </div>
+
+    </div>
+</section>
+
+<footer class="main-footer">
+    <div class="container">
+        <p>&copy; 2025 Construyendo Sueños. Todos los derechos reservados.</p>
+    </div>
+</footer>
