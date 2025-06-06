@@ -10,6 +10,14 @@ import { Firestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, quer
 // Para Firebase Authentication
 import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 
+// Definición de la interfaz para un Voucher
+interface VoucherData {
+  valorConsignacion: number | null;
+  numeroVoucher: string;
+  fechaConsignacion: string;
+  proyecto: string;
+}
+
 @Component({
   selector: 'app-formulario',
   standalone: true,
@@ -42,13 +50,10 @@ export class Formulario implements OnInit {
     usuarioTelegram: ''
   };
 
-  // Propiedades para los datos del formulario de voucher
-  formDataVoucher = {
-    valorConsignacion: '',
-    numeroVoucher: '',
-    fechaConsignacion: '',
-    proyecto: ''
-  };
+  // --- NUEVAS PROPIEDADES PARA VOUCHERS DINÁMICOS ---
+  cantidadVouchers: number = 1; // Controla cuántos formularios de voucher se muestran
+  vouchers: VoucherData[] = []; // Array para almacenar los datos de múltiples vouchers
+  // --- FIN NUEVAS PROPIEDADES ---
 
   // Propiedades para mensajes y estado de carga
   message: string = '';
@@ -73,7 +78,7 @@ export class Formulario implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // No hay lógica de inicialización específica ya que todo estará visible
+    this.generateVoucherForms(); // Inicializa al menos un formulario de voucher al cargar
   }
 
   goToLogin(): void {
@@ -81,9 +86,48 @@ export class Formulario implements OnInit {
   }
 
   /**
+   * Genera o ajusta la cantidad de formularios de voucher según `cantidadVouchers`.
+   */
+  generateVoucherForms(): void {
+    if (this.cantidadVouchers < 1) {
+      this.cantidadVouchers = 1; // Asegura que siempre haya al menos un formulario
+    }
+
+    const currentLength = this.vouchers.length;
+    if (this.cantidadVouchers > currentLength) {
+      // Añadir nuevos vouchers si la cantidad aumenta
+      for (let i = currentLength; i < this.cantidadVouchers; i++) {
+        this.vouchers.push({
+          valorConsignacion: null,
+          numeroVoucher: '',
+          fechaConsignacion: '',
+          proyecto: ''
+        });
+      }
+    } else if (this.cantidadVouchers < currentLength) {
+      // Remover vouchers si la cantidad disminuye
+      this.vouchers = this.vouchers.slice(0, this.cantidadVouchers);
+    }
+  }
+
+  /**
+   * Elimina un formulario de voucher específico por su índice.
+   * @param index El índice del voucher a eliminar.
+   */
+  removeVoucherForm(index: number): void {
+    if (this.vouchers.length > 1) { // Asegura que siempre quede al menos un voucher
+      this.vouchers.splice(index, 1);
+      this.cantidadVouchers--; // Ajusta la cantidad para reflejar el cambio
+    } else {
+      this.message = 'Debe haber al menos un formulario de voucher.';
+      this.isSuccess = false;
+    }
+  }
+
+  /**
    * Método para registrar (crear) un nuevo cliente o manejar un cliente existente.
    */
-  async onSubmitClient() { // Renombrado de nuevo a onSubmitClient
+  async onSubmitClient() {
     this.isLoading = true;
     this.message = ''; // Limpiar mensajes previos
 
@@ -98,12 +142,14 @@ export class Formulario implements OnInit {
       return;
     }
 
-    // Validaciones de campos obligatorios
+    // Validaciones de campos obligatorios (cliente)
+    // Se asume que el HTML ya maneja `required` y `pattern` para una pre-validación visual
+    // Pero es buena práctica tener validación también en el TS.
     if (!this.formData.nombres || !this.formData.apellidos || !this.formData.correo ||
         !this.formData.numeroDocumento || !this.formData.telefono || !this.formData.password || !this.formData.rol ||
         !this.formData.whatsapp || !this.formData.pais || !this.formData.ciudad || !this.formData.departamento ||
         !this.formData.usuarioTelegram) {
-      this.message = 'Por favor, complete todos los campos obligatorios.';
+      this.message = 'Por favor, complete todos los campos obligatorios del cliente.';
       this.isSuccess = false;
       this.isLoading = false;
       return;
@@ -146,7 +192,7 @@ export class Formulario implements OnInit {
       return;
     }
 
-    if (this.formData.pasaporte && !/^[a-zA-Z0-9]+$/.test(this.formData.pasaporte)) {
+    if (this.formData.pasaporte && !/^[a-zA-Z0-9]*$/.test(this.formData.pasaporte)) { // Ajustado el patrón para ser opcional
       this.message = 'El pasaporte debe contener solo letras y números.';
       this.isSuccess = false;
       this.isLoading = false;
@@ -194,8 +240,6 @@ export class Formulario implements OnInit {
         const existingDoc = querySnapshot.docs[0];
         docRefId = existingDoc.id;
         this.clienteDocId = docRefId; // Almacenar el ID del documento
-        this.message = 'Cliente existente: Los datos se actualizarán. Si desea modificar datos del voucher, hágalo en la sección correspondiente.';
-        this.isSuccess = false; // No es un "registro nuevo exitoso"
 
         // Intentar crear/obtener el usuario en Auth. Si ya existe, no hay problema.
         try {
@@ -215,17 +259,16 @@ export class Formulario implements OnInit {
           nombres: this.formData.nombres,
           apellidos: this.formData.apellidos,
           correo: this.formData.correo,
-          numeroDocumento: this.formData.numeroDocumento, // Mantener el mismo número de documento
+          numeroDocumento: this.formData.numeroDocumento,
           telefono: this.formData.telefono,
           whatsapp: this.formData.whatsapp,
           pasaporte: this.formData.pasaporte,
           pais: this.formData.pais,
           ciudad: this.formData.ciudad,
           departamento: this.formData.departamento,
-          fechaRegistro: this.formData.fechaRegistro, // Actualizar fecha de registro si se quiere
+          fechaRegistro: this.formData.fechaRegistro,
           usuarioTelegram: this.formData.usuarioTelegram.startsWith('@') ? this.formData.usuarioTelegram.substring(1) : this.formData.usuarioTelegram,
           rol: this.formData.rol
-          // Los campos de voucher no se tocan aquí, se manejan en onSubmitVoucher
         });
         this.message = 'Datos del cliente actualizados exitosamente.';
         this.isSuccess = true;
@@ -250,11 +293,7 @@ export class Formulario implements OnInit {
           fechaRegistro: this.formData.fechaRegistro,
           usuarioTelegram: this.formData.usuarioTelegram.startsWith('@') ? this.formData.usuarioTelegram.substring(1) : this.formData.usuarioTelegram,
           rol: this.formData.rol,
-          // Inicializar campos de voucher como null para que existan en el documento
-          valorConsignacion: null,
-          numeroVoucher: null,
-          fechaConsignacion: null,
-          proyecto: null
+          vouchers: [] // Inicializar vouchers como un array vacío
         });
         docRefId = newDocRef.id;
         this.clienteDocId = docRefId; // Almacenar el ID del documento
@@ -266,13 +305,13 @@ export class Formulario implements OnInit {
       // para que el usuario pueda verlos o modificarlos si aplica.
       // Usa el numeroDocumento para la búsqueda, ya que es el identificador clave.
       this.findClientDocIdAndLoadVoucherData(this.formData.numeroDocumento);
-      this.resetForm(); // Opcional: limpiar el formulario principal después de un registro/actualización exitoso.
+      this.resetForm(); // Limpiar el formulario principal después de un registro/actualización exitoso.
 
     } catch (e: any) {
       console.error('Error al registrar/procesar cliente:', e);
       this.isSuccess = false;
 
-      if (e.code === 'auth/email-already-in-use') { // Removida la condición !userCreatedInAuth
+      if (e.code === 'auth/email-already-in-use') {
         this.message = 'El correo electrónico ya está registrado por otra cuenta. Por favor, intente con otro correo.';
       } else if (e.code === 'auth/weak-password') {
         this.message = 'La contraseña es demasiado débil. Debe tener al menos 6 caracteres (aunque sea un número).';
@@ -294,7 +333,7 @@ export class Formulario implements OnInit {
       this.isSuccess = false;
       this.foundRecord = null;
       this.resetForm(); // Limpiar formulario principal
-      this.resetFormVoucher(); // Limpiar formulario de voucher
+      this.resetVouchersForms(); // Limpiar formularios de voucher
       this.clienteDocId = null;
       return;
     }
@@ -304,7 +343,7 @@ export class Formulario implements OnInit {
     this.foundRecord = null;
     this.clienteDocId = null; // Resetear el ID del documento
     this.resetForm(); // Limpiar el formulario de cliente antes de cargar datos
-    this.resetFormVoucher(); // Limpiar el formulario de voucher antes de cargar datos
+    this.resetVouchersForms(); // Limpiar los formularios de voucher antes de cargar datos
 
     try {
       const q = query(collection(this.firestore, 'clientes'), where('numeroDocumento', '==', this.searchNumeroDocumento));
@@ -312,41 +351,51 @@ export class Formulario implements OnInit {
 
       if (!querySnapshot.empty) {
         const docSnapshot = querySnapshot.docs[0];
-        this.foundRecord = { id: docSnapshot.id, ...docSnapshot.data() };
+        const data = docSnapshot.data();
+        this.foundRecord = { id: docSnapshot.id, ...data };
         this.clienteDocId = docSnapshot.id; // Almacenar el ID del documento
         this.message = 'Cliente encontrado. Puede actualizar sus datos o sus datos de voucher.';
         this.isSuccess = true;
 
         // Precargar el formulario principal con los datos encontrados para facilitar la edición
-        this.formData.nombres = this.foundRecord.nombres;
-        this.formData.apellidos = this.foundRecord.apellidos;
-        this.formData.correo = this.foundRecord.correo;
-        this.formData.numeroDocumento = this.foundRecord.numeroDocumento;
-        this.formData.telefono = this.foundRecord.telefono;
-        this.formData.password = this.foundRecord.numeroDocumento; // Precargar contraseña (si se usa numeroDocumento como tal)
+        this.formData.nombres = data['nombres'];
+        this.formData.apellidos = data['apellidos'];
+        this.formData.correo = data['correo'];
+        this.formData.numeroDocumento = data['numeroDocumento'];
+        this.formData.telefono = data['telefono'];
+        this.formData.password = data['numeroDocumento']; // Precargar contraseña (si se usa numeroDocumento como tal)
         this.formData.privacyPolicy = true; // Asumimos que ya aceptó
-        this.formData.rol = this.foundRecord.rol || 'usuario';
+        this.formData.rol = data['rol'] || 'usuario';
 
-        this.formData.pasaporte = this.foundRecord.pasaporte || '';
-        this.formData.whatsapp = this.foundRecord.whatsapp || '';
-        this.formData.pais = this.foundRecord.pais || '';
-        this.formData.ciudad = this.foundRecord.ciudad || '';
-        this.formData.departamento = this.foundRecord.departamento || '';
-        this.formData.fechaRegistro = this.foundRecord.fechaRegistro || '';
-        this.formData.usuarioTelegram = this.foundRecord.usuarioTelegram ? `@${this.foundRecord.usuarioTelegram}` : '';
+        this.formData.pasaporte = data['pasaporte'] || '';
+        this.formData.whatsapp = data['whatsapp'] || '';
+        this.formData.pais = data['pais'] || '';
+        this.formData.ciudad = data['ciudad'] || '';
+        this.formData.departamento = data['departamento'] || '';
+        this.formData.fechaRegistro = data['fechaRegistro'] || '';
+        this.formData.usuarioTelegram = data['usuarioTelegram'] ? `@${data['usuarioTelegram']}` : '';
 
-        // Precargar los datos del voucher si existen
-        this.formDataVoucher.valorConsignacion = String(this.foundRecord.valorConsignacion || '');
-        this.formDataVoucher.numeroVoucher = this.foundRecord.numeroVoucher || '';
-        this.formDataVoucher.fechaConsignacion = this.foundRecord.fechaConsignacion || '';
-        this.formDataVoucher.proyecto = this.foundRecord.proyecto || '';
+        // Precargar los datos de los vouchers si existen
+        if (data['vouchers'] && Array.isArray(data['vouchers'])) {
+          this.vouchers = data['vouchers'].map((v: any) => ({
+            valorConsignacion: v.valorConsignacion !== undefined ? parseFloat(v.valorConsignacion) : null,
+            numeroVoucher: v.numeroVoucher || '',
+            fechaConsignacion: v.fechaConsignacion || '',
+            proyecto: v.proyecto || ''
+          }));
+          this.cantidadVouchers = this.vouchers.length > 0 ? this.vouchers.length : 1;
+        } else {
+          this.vouchers = []; // Asegurarse de que sea un array vacío si no hay vouchers
+          this.cantidadVouchers = 1;
+          this.generateVoucherForms(); // Generar un formulario vacío por defecto
+        }
 
       } else {
         this.message = 'No se encontró ningún cliente con ese número de documento.';
         this.isSuccess = false;
         this.foundRecord = null;
         this.resetForm(); // Limpiar el formulario de cliente
-        this.resetFormVoucher(); // Limpiar el formulario de voucher
+        this.resetVouchersForms(); // Limpiar los formularios de voucher
       }
     } catch (e) {
       console.error('Error al buscar cliente: ', e);
@@ -362,6 +411,9 @@ export class Formulario implements OnInit {
    * Este método ahora es similar a la parte de actualización dentro de onSubmitClient
    * pero se ejecuta de forma explícita desde el botón "Actualizar Datos".
    */
+  // Este método fue eliminado en el HTML, por lo que su uso aquí no es directo.
+  // Si deseas mantenerlo como una función separada, considera su invocación.
+  /*
   async updateClient() {
     if (!this.foundRecord || !this.foundRecord.id) {
       this.message = 'Primero busque un cliente para actualizar.';
@@ -382,42 +434,7 @@ export class Formulario implements OnInit {
       this.isLoading = false;
       return;
     }
-    if (!/^\d+$/.test(this.formData.numeroDocumento)) {
-      this.message = 'El número de documento solo debe contener números.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
-    if (!/^\d{7,}$/.test(this.formData.telefono)) {
-      this.message = 'El número telefónico es obligatorio y debe contener al menos 7 dígitos numéricos.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
-    if (!/^\d{7,}$/.test(this.formData.whatsapp)) {
-      this.message = 'El número de Whatsapp es obligatorio y debe contener al menos 7 dígitos numéricos.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
-    if (this.formData.pasaporte && !/^[a-zA-Z0-9]+$/.test(this.formData.pasaporte)) {
-      this.message = 'El pasaporte debe contener solo letras y números.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
-    if (!this.roles.includes(this.formData.rol)) {
-      this.message = 'El rol seleccionado no es válido.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
-    if (/\s/.test(this.formData.usuarioTelegram)) {
-        this.message = 'El usuario de Telegram no debe contener espacios.';
-        this.isSuccess = false;
-        this.isLoading = false;
-        return;
-    }
+    // ... (otras validaciones de formato)
 
     try {
       const docRef = doc(this.firestore, 'clientes', this.foundRecord.id);
@@ -438,10 +455,6 @@ export class Formulario implements OnInit {
 
       this.message = 'Datos del cliente actualizados exitosamente.';
       this.isSuccess = true;
-      // No reseteamos el formulario completo para que puedan seguir editando si lo desean
-      // this.resetForm();
-      // this.foundRecord = null;
-      // this.searchNumeroDocumento = '';
     } catch (e) {
       console.error('Error al actualizar cliente: ', e);
       this.message = 'Error al actualizar los datos del cliente. Inténtelo de nuevo.';
@@ -450,6 +463,7 @@ export class Formulario implements OnInit {
       this.isLoading = false;
     }
   }
+  */
 
   /**
    * Método para eliminar un cliente (DELETE).
@@ -475,7 +489,7 @@ export class Formulario implements OnInit {
       this.message = 'Cliente eliminado exitosamente.';
       this.isSuccess = true;
       this.resetForm();
-      this.resetFormVoucher(); // También limpiar el formulario de voucher
+      this.resetVouchersForms(); // También limpiar los formularios de voucher
       this.foundRecord = null;
       this.searchNumeroDocumento = '';
       this.clienteDocId = null; // Reiniciar el ID del cliente
@@ -489,70 +503,69 @@ export class Formulario implements OnInit {
   }
 
   /**
-   * Método para registrar (actualizar) los datos del voucher en el cliente existente.
+   * Método para registrar (actualizar) los datos de múltiples vouchers en el cliente existente.
    */
-  async onSubmitVoucher() {
+  async onSubmitVouchers() {
     this.isLoading = true;
     this.message = '';
 
     if (!this.clienteDocId) {
-      this.message = 'Error: No se ha seleccionado o registrado un cliente para registrar el voucher. Use el buscador o registre un cliente primero.';
+      this.message = 'Error: No se ha seleccionado o registrado un cliente para registrar los vouchers. Use el buscador o registre un cliente primero.';
       this.isSuccess = false;
       this.isLoading = false;
       return;
     }
 
-    // Validaciones específicas para los campos de voucher
-    if (!this.formDataVoucher.valorConsignacion || !this.formDataVoucher.numeroVoucher ||
-        !this.formDataVoucher.fechaConsignacion || !this.formDataVoucher.proyecto) {
-      this.message = 'Por favor, complete todos los campos de consignación obligatorios.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
+    // Validaciones para cada voucher
+    for (const voucher of this.vouchers) {
+      if (!voucher.valorConsignacion || !voucher.numeroVoucher ||
+          !voucher.fechaConsignacion || !voucher.proyecto) {
+        this.message = 'Por favor, complete todos los campos de todos los vouchers obligatorios.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+      }
 
-    if (!/^\d+(\.\d{1,2})?$/.test(this.formDataVoucher.valorConsignacion) || parseFloat(this.formDataVoucher.valorConsignacion) <= 0) {
-      this.message = 'El valor de consignación es obligatorio y debe ser un número positivo (puede tener decimales).';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
+      if (typeof voucher.valorConsignacion !== 'number' || voucher.valorConsignacion <= 0 || !/^\d+(\.\d{1,2})?$/.test(voucher.valorConsignacion.toString())) {
+        this.message = 'El valor de consignación debe ser un número positivo (puede tener decimales).';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+      }
 
-    if (!/^[a-zA-Z0-9]+$/.test(this.formDataVoucher.numeroVoucher)) {
-      this.message = 'El número de voucher es obligatorio y debe ser alfanumérico.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
+      if (!/^[a-zA-Z0-9]+$/.test(voucher.numeroVoucher)) {
+        this.message = 'El número de voucher debe ser alfanumérico.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+      }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(this.formDataVoucher.fechaConsignacion)) {
-      this.message = 'La fecha de consignación debe tener el formato AAAA-MM-DD.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
-    }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(voucher.fechaConsignacion)) {
+        this.message = 'La fecha de consignación debe tener el formato AAAA-MM-DD.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+      }
 
-    if (!this.proyectos.includes(this.formDataVoucher.proyecto)) {
-      this.message = 'El proyecto seleccionado no es válido.';
-      this.isSuccess = false;
-      this.isLoading = false;
-      return;
+      if (!this.proyectos.includes(voucher.proyecto)) {
+        this.message = 'Uno de los proyectos seleccionados no es válido.';
+        this.isSuccess = false;
+        this.isLoading = false;
+        return;
+      }
     }
 
     try {
       const docRef = doc(this.firestore, 'clientes', this.clienteDocId);
       await updateDoc(docRef, {
-        valorConsignacion: parseFloat(this.formDataVoucher.valorConsignacion),
-        numeroVoucher: this.formDataVoucher.numeroVoucher,
-        fechaConsignacion: this.formDataVoucher.fechaConsignacion,
-        proyecto: this.formDataVoucher.proyecto
+        vouchers: this.vouchers // Guarda todo el array de vouchers
       });
 
       this.message = 'Datos de consignación registrados/actualizados exitosamente.';
       this.isSuccess = true;
-      this.resetFormVoucher(); // Limpiar el formulario de voucher después de registrarlo
-      // Mantener los datos del cliente principal y foundRecord si se habían buscado
-      // para que el usuario pueda seguir interactuando con ese cliente.
+      this.resetVouchersForms(); // Limpiar los formularios de voucher después de registrar
+      // Opcional: Podrías buscar de nuevo el cliente para que el "foundRecord" refleje los nuevos vouchers.
+      this.searchClient();
     } catch (e) {
       console.error('Error al registrar datos de consignación: ', e);
       this.message = 'Error al registrar los datos de consignación. Inténtelo de nuevo.';
@@ -562,15 +575,16 @@ export class Formulario implements OnInit {
     }
   }
 
-
   /**
    * Carga los datos del voucher para un cliente específico (utilizado después del registro principal o la búsqueda).
    * Esto es útil si el cliente ya tenía datos de voucher y quieres precargarlos.
+   * Ahora carga un array de vouchers.
    */
   async findClientDocIdAndLoadVoucherData(numeroDocumento: string) {
     this.isLoading = true;
     this.message = '';
     this.clienteDocId = null; // Reiniciar el ID del cliente antes de buscar
+    this.vouchers = []; // Limpiar vouchers existentes antes de cargar
 
     try {
       const q = query(collection(this.firestore, 'clientes'), where('numeroDocumento', '==', numeroDocumento));
@@ -581,15 +595,22 @@ export class Formulario implements OnInit {
         this.clienteDocId = docSnapshot.id;
         const data = docSnapshot.data();
 
-        // Precargar datos del voucher si existen
-        this.formDataVoucher.valorConsignacion = String(data['valorConsignacion'] || '');
-        this.formDataVoucher.numeroVoucher = data['numeroVoucher'] || '';
-        this.formDataVoucher.fechaConsignacion = data['fechaConsignacion'] || '';
-        this.formDataVoucher.proyecto = data['proyecto'] || '';
+        // Precargar datos de los vouchers si existen
+        if (data['vouchers'] && Array.isArray(data['vouchers'])) {
+          this.vouchers = data['vouchers'].map((v: any) => ({
+            valorConsignacion: v.valorConsignacion !== undefined ? parseFloat(v.valorConsignacion) : null,
+            numeroVoucher: v.numeroVoucher || '',
+            fechaConsignacion: v.fechaConsignacion || '',
+            proyecto: v.proyecto || ''
+          }));
+          this.cantidadVouchers = this.vouchers.length > 0 ? this.vouchers.length : 1;
+        } else {
+          this.vouchers = []; // Asegurarse de que sea un array vacío si no hay vouchers
+          this.cantidadVouchers = 1;
+          this.generateVoucherForms(); // Generar un formulario vacío por defecto
+        }
 
       } else {
-        // Esto podría ocurrir si se llama después de un registro, pero el ID no se propagó correctamente.
-        // O si el cliente fue eliminado.
         this.message = 'Error interno: Cliente no encontrado para cargar/asociar datos de voucher.';
         this.isSuccess = false;
         this.clienteDocId = null;
@@ -629,14 +650,11 @@ export class Formulario implements OnInit {
   }
 
   /**
-   * Método para limpiar el formulario de voucher.
+   * Método para limpiar los formularios de vouchers y resetear la cantidad a 1.
    */
-  resetFormVoucher(): void {
-    this.formDataVoucher = {
-      valorConsignacion: '',
-      numeroVoucher: '',
-      fechaConsignacion: '',
-      proyecto: ''
-    };
+  resetVouchersForms(): void {
+    this.cantidadVouchers = 1;
+    this.vouchers = [];
+    this.generateVoucherForms(); // Asegura que siempre haya un formulario vacío
   }
 }

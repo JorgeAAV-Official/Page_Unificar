@@ -1,13 +1,13 @@
 // src/app/principal/principal.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule, NgIf, NgForOf, CurrencyPipe } from '@angular/common';
+import { CommonModule, NgIf, NgForOf, CurrencyPipe } from '@angular/common'; // Asegúrate de NgForOf aquí
 import { FormsModule } from '@angular/forms';
 
 // Importaciones de Firebase
 import { Auth, signOut, User, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, collection, query, where, getDocs, doc, updateDoc } from '@angular/fire/firestore';
-import { Observable, Subscriber } from 'rxjs'; // <--- IMPORTAR Subscriber de rxjs
+import { Observable, Subscriber } from 'rxjs';
 
 @Component({
   selector: 'app-principal',
@@ -15,7 +15,9 @@ import { Observable, Subscriber } from 'rxjs'; // <--- IMPORTAR Subscriber de rx
   imports: [
     CommonModule,
     NgIf,
-    FormsModule
+    NgForOf, // Importar NgForOf para usar *ngFor
+    FormsModule,
+    CurrencyPipe // Importar CurrencyPipe para usar el pipe de moneda
   ],
   templateUrl: './principal.html',
   styleUrl: './principal.css'
@@ -41,10 +43,10 @@ export class Principal implements OnInit {
     console.log('ngOnInit: Initial isLoading =', this.isLoading);
     this.isLoading = true;
 
-    new Observable<User | null>((subscriber: Subscriber<User | null>) => { // <--- Tipo explícito para 'subscriber'
+    new Observable<User | null>((subscriber: Subscriber<User | null>) => {
       const unsubscribe = onAuthStateChanged(this.auth, (user) => {
         subscriber.next(user);
-      }, (error: any) => { // <--- Tipo explícito para 'error'
+      }, (error: any) => {
         subscriber.error(error);
       });
       return unsubscribe;
@@ -65,7 +67,7 @@ export class Principal implements OnInit {
         this.router.navigate(['/login']);
         console.log('Auth state changed: isLoading after no user logic =', this.isLoading);
       }
-    }, (error: any) => { // <--- Tipo explícito para 'error'
+    }, (error: any) => {
       console.error('Error al observar el estado de autenticación:', error);
       this.isLoading = false;
       this.errorMessage = 'Error al verificar la sesión. Por favor, intente de nuevo.';
@@ -85,9 +87,17 @@ export class Principal implements OnInit {
 
       if (!querySnapshot.empty) {
         const docSnapshot = querySnapshot.docs[0];
-        this.userData = docSnapshot.data();
+        const data = docSnapshot.data();
+
+        // Si usuarioTelegram viene sin '@' desde la base de datos, añádelo para la visualización.
+        // Asumiendo que en la base de datos se guarda sin el '@'
+        if (data['usuarioTelegram'] && !data['usuarioTelegram'].startsWith('@')) {
+            data['usuarioTelegram'] = '@' + data['usuarioTelegram'];
+        }
+
+        this.userData = data;
         this.userDocId = docSnapshot.id;
-        this.editableUserData = { ...this.userData };
+        this.editableUserData = { ...this.userData }; // Para la edición del perfil principal
         console.log('Datos del usuario cargados:', this.userData);
       } else {
         console.log('No se encontró el documento del perfil para el correo:', email);
@@ -96,7 +106,7 @@ export class Principal implements OnInit {
         this.editableUserData = null;
         this.userDocId = null;
       }
-    } catch (error: any) { // <--- Tipo explícito para 'error'
+    } catch (error: any) {
       console.error('Error en fetchUserData:', error);
       this.errorMessage = 'Error al cargar su perfil. Por favor, inténtelo de nuevo más tarde.';
       this.userData = null;
@@ -112,6 +122,10 @@ export class Principal implements OnInit {
   enableEditing(): void {
     this.isEditing = true;
     this.editableUserData = { ...this.userData };
+    // Asegurarse de quitar el '@' si está presente antes de editar
+    if (this.editableUserData.usuarioTelegram && this.editableUserData.usuarioTelegram.startsWith('@')) {
+        this.editableUserData.usuarioTelegram = this.editableUserData.usuarioTelegram.substring(1);
+    }
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -119,6 +133,10 @@ export class Principal implements OnInit {
   cancelEditing(): void {
     this.isEditing = false;
     this.editableUserData = { ...this.userData };
+    // Asegurarse de re-añadir el '@' si se cancela y no lo tenía el dato original
+    if (this.userData.usuarioTelegram && !this.userData.usuarioTelegram.startsWith('@')) {
+        this.userData.usuarioTelegram = '@' + this.userData.usuarioTelegram;
+    }
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -141,13 +159,15 @@ export class Principal implements OnInit {
         pasaporte: this.editableUserData.pasaporte,
         telefono: this.editableUserData.telefono,
         whatsapp: this.editableUserData.whatsapp,
-        usuarioTelegram: this.editableUserData.usuarioTelegram,
+        // Guardar usuarioTelegram sin el '@' en la base de datos
+        usuarioTelegram: this.editableUserData.usuarioTelegram.startsWith('@') ? this.editableUserData.usuarioTelegram.substring(1) : this.editableUserData.usuarioTelegram,
         pais: this.editableUserData.pais,
         departamento: this.editableUserData.departamento,
         ciudad: this.editableUserData.ciudad,
-        valorConsignacion: this.editableUserData.valorConsignacion,
-        numerovoucher: this.editableUserData.numerovoucher,
-        proyecto: this.editableUserData.proyecto
+        // Eliminados los campos de voucher de aquí, ya que no se editan en esta sección
+        // valorConsignacion: this.editableUserData.valorConsignacion,
+        // numerovoucher: this.editableUserData.numerovoucher,
+        // proyecto: this.editableUserData.proyecto
       };
 
       for (const key in dataToUpdate) {
@@ -158,10 +178,15 @@ export class Principal implements OnInit {
 
       await updateDoc(userRef, dataToUpdate);
       this.userData = { ...this.editableUserData };
+      // Restaurar el '@' para la visualización después de guardar
+      if (this.userData.usuarioTelegram && !this.userData.usuarioTelegram.startsWith('@')) {
+          this.userData.usuarioTelegram = '@' + this.userData.usuarioTelegram;
+      }
+
       this.isEditing = false;
       this.successMessage = '¡Perfil actualizado exitosamente!';
       console.log('Perfil actualizado con éxito:', this.userData);
-    } catch (error: any) { // <--- Tipo explícito para 'error'
+    } catch (error: any) {
       console.error('Error al actualizar el perfil:', error);
       this.errorMessage = 'Error al actualizar el perfil. Por favor, inténtelo de nuevo.';
     } finally {
@@ -174,7 +199,7 @@ export class Principal implements OnInit {
     try {
       await signOut(this.auth);
       this.router.navigate(['/login']);
-    } catch (error: any) { // <--- Tipo explícito para 'error'
+    } catch (error: any) {
       console.error('Error al cerrar sesión:', error);
       this.errorMessage = 'Error al cerrar sesión. Por favor, inténtelo de nuevo.';
     }

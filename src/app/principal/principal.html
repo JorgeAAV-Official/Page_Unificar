@@ -2,7 +2,7 @@
     <div class="header-content">
         <h1 class="header-title">CONSTRUYENDO SUEÑOS</h1>
         <p class="header-subtitle">TRANSFORMANDO VIDAS.</p>
-        
+
     </div>
     <div class="wave">
         <svg viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
@@ -20,7 +20,7 @@
 
 <section id="features" class="features-section">
     <div class="container">
-        </div>
+    </div>
 </section>
 
 
@@ -56,7 +56,7 @@
                 <div class="detail-item">
                     <label>No. Documento</label>
                     <p class="detail-value">{{ userData.numeroDocumento }}</p>
-                    </div>
+                </div>
                 <div class="detail-item">
                     <label>Pasaporte</label>
                     <p class="detail-value" *ngIf="!isEditing">{{ userData.pasaporte || 'N/A' }}</p>
@@ -80,7 +80,7 @@
                 <div class="detail-item">
                     <label>Correo Electrónico</label>
                     <p class="detail-value">{{ userData.correo }}</p>
-                    </div>
+                </div>
                 <div class="detail-item">
                     <label>País</label>
                     <p class="detail-value" *ngIf="!isEditing">{{ userData.pais }}</p>
@@ -96,7 +96,7 @@
                     <p class="detail-value" *ngIf="!isEditing">{{ userData.ciudad }}</p>
                     <input class="profile-input" *ngIf="isEditing" [(ngModel)]="editableUserData.ciudad" type="text">
                 </div>
-                </div>
+            </div>
 
             <div class="profile-actions">
                 <ng-container *ngIf="!isEditing">
@@ -109,6 +109,52 @@
                     <button class="btn btn-outline" (click)="cancelEditing()">Cancelar</button>
                 </ng-container>
             </div>
+        </div>
+
+        <div class="profile-card mt-8" *ngIf="!isLoading && userData && userData.vouchers && userData.vouchers.length > 0">
+            <div class="profile-header">
+                <h3>Mis Vouchers Registrados</h3>
+            </div>
+            <div class="vouchers-grid">
+                <div class="voucher-header">
+                    <p>Voucher</p>
+                </div>
+                <div *ngFor="let voucher of userData.vouchers; let i = index" class="voucher-header">
+                    <p>Voucher #{{ i + 1 }}</p>
+                </div>
+
+                <div class="detail-item-label">
+                    <label>Valor Consignación</label>
+                </div>
+                <div *ngFor="let voucher of userData.vouchers" class="detail-item-value">
+                    <p>{{ voucher.valorConsignacion | currency:'USD':'symbol':'1.2-2' }}</p>
+                </div>
+
+                <div class="detail-item-label">
+                    <label>Número Voucher</label>
+                </div>
+                <div *ngFor="let voucher of userData.vouchers" class="detail-item-value">
+                    <p>{{ voucher.numeroVoucher }}</p>
+                </div>
+
+                <div class="detail-item-label">
+                    <label>Fecha de Consignación</label>
+                </div>
+                <div *ngFor="let voucher of userData.vouchers" class="detail-item-value">
+                    <p>{{ voucher.fechaConsignacion }}</p>
+                </div>
+
+                <div class="detail-item-label">
+                    <label>Proyecto</label>
+                </div>
+                <div *ngFor="let voucher of userData.vouchers" class="detail-item-value">
+                    <p>{{ voucher.proyecto }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && userData && (!userData.vouchers || userData.vouchers.length === 0)" class="no-user-message mt-8">
+            No tienes vouchers registrados.
         </div>
 
         <div *ngIf="!isLoading && !userData && !errorMessage" class="no-user-message">

@@ -305,9 +305,19 @@
         <p class="text-gray-700 mb-2"><strong>Fecha Registro:</strong> {{ foundRecord.fechaRegistro }}</p>
         <p class="text-gray-700 mb-4"><strong>Rol:</strong> {{ foundRecord.rol | titlecase }}</p>
 
+        <div *ngIf="foundRecord.vouchers && foundRecord.vouchers.length > 0">
+          <h4 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2 mt-6">Vouchers Registrados:</h4>
+          <div *ngFor="let voucher of foundRecord.vouchers; let i = index" class="bg-white p-4 rounded-md shadow mb-4">
+            <h5 class="font-bold text-gray-600 mb-2">Voucher #{{ i + 1 }}</h5>
+            <p class="text-gray-700 mb-1"><strong>Valor Consignación:</strong> {{ voucher.valorConsignacion | currency:'USD':'symbol':'1.2-2' }}</p>
+            <p class="text-gray-700 mb-1"><strong>Número Voucher:</strong> {{ voucher.numeroVoucher }}</p>
+            <p class="text-gray-700 mb-1"><strong>Fecha Consignación:</strong> {{ voucher.fechaConsignacion }}</p>
+            <p class="text-gray-700 mb-1"><strong>Proyecto:</strong> {{ voucher.proyecto }}</p>
+          </div>
+        </div>
+
 
         <div class="flex space-x-4">
-          
           <button (click)="deleteClient()" type="button" [disabled]="isLoading"
                   class="transition-all duration-300 transform hover:scale-105 shadow bg-red-600 hover:bg-red-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded">
             Eliminar Cliente
@@ -321,77 +331,104 @@
     <div class="md:col-span-12 p-10">
       <h3 class="text-2xl font-bold mb-6 text-gray-800 text-center">Registrar/Actualizar Datos de Consignación (Voucher)</h3>
 
-      <form (ngSubmit)="onSubmitVoucher()" #voucherForm="ngForm">
-        <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="valorConsignacion">
-              Valor Consignación
-            </label>
-            <input id="valorConsignacion" name="valorConsignacion"
-                   [(ngModel)]="formDataVoucher.valorConsignacion"
-                   required
-                   pattern="^\d+(\.\d{1,2})?$" title="Solo números positivos, puede tener 2 decimales"
-                   class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-                   type="number" step="0.01" placeholder="Ej: 100000.00">
-            <div *ngIf="voucherForm.controls['valorConsignacion']?.invalid && (voucherForm.controls['valorConsignacion']?.dirty || voucherForm.controls['valorConsignacion']?.touched)" class="text-red-500 text-xs italic mt-2">
-              El valor de consignación es obligatorio y debe ser un número positivo (puede tener decimales).
-            </div>
-          </div>
-          <div class="w-full md:w-1/2 px-3">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="numeroVoucher">
-              Número Voucher
-            </label>
-            <input id="numeroVoucher" name="numeroVoucher"
-                   [(ngModel)]="formDataVoucher.numeroVoucher"
-                   required
-                   pattern="^[a-zA-Z0-9]+$" title="Solo letras y números"
-                   class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-                   type="text" placeholder="Ej: ABC123XYZ">
-            <div *ngIf="voucherForm.controls['numeroVoucher']?.invalid && (voucherForm.controls['numeroVoucher']?.dirty || voucherForm.controls['numeroVoucher']?.touched)" class="text-red-500 text-xs italic mt-2">
-              El número de voucher es obligatorio y debe ser alfanumérico.
-            </div>
+      <div class="flex flex-wrap -mx-3 mb-6">
+        <div class="w-full px-3 mb-6 md:mb-0">
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="cantidadVouchers">
+            Cantidad de Vouchers
+          </label>
+          <input id="cantidadVouchers" name="cantidadVouchers"
+                 [(ngModel)]="cantidadVouchers"
+                 (change)="generateVoucherForms()"
+                 min="1"
+                 class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                 type="number" placeholder="Ej: 1">
+          <div *ngIf="cantidadVouchers <= 0" class="text-red-500 text-xs italic mt-2">
+            La cantidad de vouchers debe ser al menos 1.
           </div>
         </div>
+      </div>
 
-        <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="fechaConsignacion">
-              Fecha de Consignación
-            </label>
-            <input id="fechaConsignacion" name="fechaConsignacion"
-                   [(ngModel)]="formDataVoucher.fechaConsignacion"
-                   required
-                   class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
-                   type="date">
-            <div *ngIf="voucherForm.controls['fechaConsignacion']?.invalid && (voucherForm.controls['fechaConsignacion']?.dirty || voucherForm.controls['fechaConsignacion']?.touched)" class="text-red-500 text-xs italic mt-2">
-              La fecha de consignación es obligatoria.
+      <form (ngSubmit)="onSubmitVouchers()" #vouchersForm="ngForm">
+        <div *ngFor="let voucher of vouchers; let i = index" class="border border-gray-300 p-6 rounded-lg mb-6 shadow-sm">
+          <h4 class="text-xl font-bold mb-4 text-gray-700">Voucher #{{ i + 1 }}</h4>
+
+          <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" [for]="'valorConsignacion_' + i">
+                Valor Consignación
+              </label>
+              <input [id]="'valorConsignacion_' + i" [name]="'valorConsignacion_' + i"
+                     [(ngModel)]="voucher.valorConsignacion"
+                     required
+                     pattern="^\d+(\.\d{1,2})?$" title="Solo números positivos, puede tener 2 decimales"
+                     class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                     type="number" step="0.01" placeholder="Ej: 100000.00">
+              <div *ngIf="vouchersForm.controls['valorConsignacion_' + i]?.invalid && (vouchersForm.controls['valorConsignacion_' + i]?.dirty || vouchersForm.controls['valorConsignacion_' + i]?.touched)" class="text-red-500 text-xs italic mt-2">
+                El valor de consignación es obligatorio y debe ser un número positivo (puede tener decimales).
+              </div>
+            </div>
+            <div class="w-full md:w-1/2 px-3">
+              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" [for]="'numeroVoucher_' + i">
+                Número Voucher
+              </label>
+              <input [id]="'numeroVoucher_' + i" [name]="'numeroVoucher_' + i"
+                     [(ngModel)]="voucher.numeroVoucher"
+                     required
+                     pattern="^[a-zA-Z0-9]+$" title="Solo letras y números"
+                     class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                     type="text" placeholder="Ej: ABC123XYZ">
+              <div *ngIf="vouchersForm.controls['numeroVoucher_' + i]?.invalid && (vouchersForm.controls['numeroVoucher_' + i]?.dirty || vouchersForm.controls['numeroVoucher_' + i]?.touched)" class="text-red-500 text-xs italic mt-2">
+                El número de voucher es obligatorio y debe ser alfanumérico.
+              </div>
             </div>
           </div>
-          <div class="w-full md:w-1/2 px-3">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="proyecto">
-              Proyecto
-            </label>
-            <select id="proyecto" name="proyecto"
-                    [(ngModel)]="formDataVoucher.proyecto"
-                    required
-                    class="appearance-none transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 pr-10 leading-tight w-full">
-              <option value="" disabled selected>Seleccione un proyecto</option>
-              <option *ngFor="let proyectoOption of proyectos" [value]="proyectoOption">{{ proyectoOption }}</option>
-            </select>
-            <div *ngIf="voucherForm.controls['proyecto']?.invalid && (voucherForm.controls['proyecto']?.dirty || voucherForm.controls['proyecto']?.touched)" class="text-red-500 text-xs italic mt-2">
-              Debe seleccionar un proyecto.
+
+          <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" [for]="'fechaConsignacion_' + i">
+                Fecha de Consignación
+              </label>
+              <input [id]="'fechaConsignacion_' + i" [name]="'fechaConsignacion_' + i"
+                     [(ngModel)]="voucher.fechaConsignacion"
+                     required
+                     class="transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight"
+                     type="date">
+              <div *ngIf="vouchersForm.controls['fechaConsignacion_' + i]?.invalid && (vouchersForm.controls['fechaConsignacion_' + i]?.dirty || vouchersForm.controls['fechaConsignacion_' + i]?.touched)" class="text-red-500 text-xs italic mt-2">
+                La fecha de consignación es obligatoria.
+              </div>
             </div>
+            <div class="w-full md:w-1/2 px-3">
+              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" [for]="'proyecto_' + i">
+                Proyecto
+              </label>
+              <select [id]="'proyecto_' + i" [name]="'proyecto_' + i"
+                      [(ngModel)]="voucher.proyecto"
+                      required
+                      class="appearance-none transition-all duration-300 transform focus:scale-[1.02] focus:ring-2 focus:ring-sky-400 focus:outline-none bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 pr-10 leading-tight w-full">
+                <option value="" disabled selected>Seleccione un proyecto</option>
+                <option *ngFor="let proyectoOption of proyectos" [value]="proyectoOption">{{ proyectoOption }}</option>
+              </select>
+              <div *ngIf="vouchersForm.controls['proyecto_' + i]?.invalid && (vouchersForm.controls['proyecto_' + i]?.dirty || vouchersForm.controls['proyecto_' + i]?.touched)" class="text-red-500 text-xs italic mt-2">
+                Debe seleccionar un proyecto.
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button *ngIf="vouchers.length > 1" (click)="removeVoucherForm(i)" type="button"
+                    class="transition-all duration-300 transform hover:scale-105 shadow bg-red-500 hover:bg-red-400 focus:shadow-outline focus:outline-none text-white text-xs font-bold py-1 px-3 rounded">
+              Eliminar Voucher
+            </button>
           </div>
         </div>
 
         <div class="flex flex-col w-full px-3 mb-6 items-center">
           <button class="transition-all duration-300 transform hover:scale-105 shadow bg-sky-600 hover:bg-sky-500 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded mb-4 mt-6"
-                  type="submit" [disabled]="voucherForm.invalid || isLoading">
-            Registrar/Actualizar Voucher
+                  type="submit" [disabled]="vouchersForm.invalid || isLoading || !clienteDocId">
+            Registrar/Actualizar Vouchers
           </button>
-          <button (click)="resetFormVoucher()" type="button"
+          <button (click)="resetVouchersForms()" type="button"
                   class="transition-all duration-300 transform hover:scale-105 shadow bg-gray-500 hover:bg-gray-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded">
-            Limpiar Formulario de Voucher
+            Limpiar Formulario de Vouchers
           </button>
         </div>
       </form>

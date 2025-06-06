@@ -1,542 +1,322 @@
-/* src/app/principal/principal.component.css */
+/* General Body & Container Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
 
-/* Contenedor para centrar el contenido y limitar su ancho máximo */
 .container {
+    width: 90%;
     max-width: 1200px;
-    margin: 0 auto; /* Centra el contenedor horizontalmente */
-    padding: 0 20px; /* Padding a los lados para pantallas pequeñas */
+    margin: 0 auto;
+    padding: 20px 0;
 }
 
-/* Estilos generales para encabezados */
-h1, h2, h3 {
-    margin-top: 0;
-    font-weight: 700; /* Negrita por defecto */
-}
-
-/* --- Estilos de Botones (para coherencia visual) --- */
-.btn {
-    display: inline-block; /* Permite ajustar padding y margin */
-    padding: 12px 25px;
-    border-radius: 8px; /* Bordes redondeados como en Tailwind */
-    font-size: 1.1rem;
-    text-decoration: none; /* Quita el subrayado de los enlaces */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease; /* Transición suave, añadimos transform */
-    cursor: pointer; /* Indica que es clickeable */
-    text-align: center;
-    font-weight: 600; /* Semibold */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra ligera para todos los botones */
-}
-
-/* Botón primario (relleno) */
-.btn-primary {
-    background-color: var(--white); /* Fondo blanco */
-    color: var(--sky-600); /* Texto azul, contrasta con el header azul */
-    border: 2px solid var(--white);
-
-    /* Efecto hover */
-    &:hover {
-        background-color: var(--gray-100); /* Se vuelve gris claro */
-        border-color: var(--gray-100);
-        transform: translateY(-2px); /* Ligeramente hacia arriba */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Sombra más pronunciada */
-    }
-}
-
-/* Botón de contorno (transparente con borde) */
-.btn-outline {
-    background-color: transparent;
-    color: var(--sky-600); /* Texto azul */
-    border: 2px solid var(--sky-600); /* Borde azul */
-
-    /* Efecto hover */
-    &:hover {
-        background-color: var(--sky-600); /* Se rellena de azul */
-        color: var(--white); /* Texto blanco */
-        transform: translateY(-2px); /* Ligeramente hacia arriba */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Sombra más pronunciada */
-    }
-}
-
-/* --- Header / Sección Principal (Hero Section) --- */
+/* Header Styles */
 .main-header {
-    position: relative; /* Necesario para posicionar las ondas */
-    height: 500px; /* Altura fija del header */
-    display: flex;
-    flex-direction: column; /* Apila elementos verticalmente */
-    justify-content: center; /* Centra el contenido verticalmente */
-    align-items: center; /* Centra el contenido horizontalmente */
-    overflow: hidden; /* Oculta cualquier parte de la animación que se salga */
-    /* Degradado de fondo con azules de tu login */
-    background: linear-gradient(135deg, var(--sky-500) 0%, var(--blue-700) 100%);
-    color: var(--white); /* Color del texto del header */
+    background-color: #2a609c; /* Azul oscuro */
+    color: #fff;
+    padding: 20px 0;
+    position: relative;
+    overflow: hidden;
     text-align: center;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada */
 }
 
 .header-content {
     position: relative;
-    z-index: 2; /* Asegura que el texto esté encima de la animación */
-    max-width: 900px;
-    padding: 0 20px;
+    z-index: 2;
+    padding: 40px 20px;
 }
 
 .header-title {
-    font-size: 3.8rem;
-    margin-bottom: 15px;
-    font-weight: 800; /* Extra negrita */
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* Sombra de texto más fuerte */
-    color: var(--white); /* Título principal en blanco, como el "INICIO DE SESIÓN" en tu login */
+    font-size: 3em;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
 }
 
 .header-subtitle {
-    font-size: 1.6rem;
-    margin-bottom: 40px;
-    opacity: 0.98; /* Un poco más opaco que antes */
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.4; /* Espaciado más compacto */
+    font-size: 1.2em;
+    opacity: 0.9;
+    color: black;
 }
 
-/* --- Animación de Ondas en el Header (Pura CSS y SVG) --- */
+/* Wave Effect */
 .wave {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 150px; /* Altura de la sección de onda */
+    height: 100px; /* Adjust height as needed */
     overflow: hidden;
-    z-index: 1; /* Detrás del contenido, encima del fondo */
+    z-index: 1;
 }
 
 .wave svg {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    fill: #f4f7f6; /* Color of the wave */
 }
 
-.wave path {
-    fill: var(--white);
-    animation: wave-animation 20s linear infinite; /* Animación de onda */
+.parallax > use {
+    animation: move-wave 20s cubic-bezier(.55, .5, .45, .5) infinite;
 }
 
-.wave path.wave-2 {
-    fill: rgba(255, 255, 255, 0.7); /* Blanco con 70% de opacidad */
-    animation-duration: 25s; /* Velocidad diferente */
-    animation-delay: -5s; /* Desfase para que no coincidan */
+.parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 10s;
 }
 
-.wave path.wave-3 {
-    fill: rgba(255, 255, 255, 0.4); /* Blanco con 40% de opacidad */
-    animation-duration: 18s; /* Velocidad diferente */
-    animation-delay: -2s; /* Desfase */
+.parallax > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 13s;
 }
 
-/* Definición de la animación de las ondas */
-@keyframes wave-animation {
+.parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 16s;
+}
+
+@keyframes move-wave {
     0% {
-        transform: translate3d(-90px, 0, 0); /* Mueve la onda a la izquierda */
+        transform: translate3d(-90px, 0, 0);
     }
     100% {
-        transform: translate3d(85px, 0, 0); /* Mueve la onda a la derecha */
+        transform: translate3d(85px, 0, 0);
     }
 }
 
-/* --- Sección de Características --- */
-.features-section {
-    padding: 80px 20px;
-    background-color: var(--white); /* Fondo blanco */
+/* Section Titles */
+.section-title {
+    font-size: 2.2em;
+    color: #2a609c;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Sombra sutil debajo del header */
-}
-
-.features-section h2 {
-    font-size: 2.8rem;
-    margin-bottom: 50px;
-    color: var(--sky-600); /* Título de sección en azul principal */
-    font-weight: 700;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px; /* Espaciado entre elementos de la grilla */
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.feature-item {
-    background-color: var(--gray-100); /* Fondo de tarjetas como tus inputs */
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra de las tarjetas */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animación al hacer hover */
-    text-align: left;
-    border-left: 5px solid var(--sky-500); /* Toque de color azul en el borde izquierdo */
-}
-
-/* Efecto hover para las tarjetas de características */
-.feature-item:hover {
-    transform: translateY(-8px); /* Se eleva ligeramente */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
-}
-
-.feature-item h3 {
-    font-size: 1.9rem;
-    color: var(--sky-600); /* Títulos de características en azul */
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
-.feature-item p {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: var(--gray-700); /* Texto de características */
-}
-
-/* --- Sección de Llamada a la Acción (CTA) --- */
-.call-to-action-section {
-    padding: 100px 20px;
-    background-color: var(--gray-100); /* Fondo gris claro para la CTA, coherente con inputs */
-    text-align: center;
-    color: var(--gray-700); /* Texto principal */
-}
-
-.call-to-action-section h2 {
-    font-size: 3rem;
-    margin-bottom: 25px;
-    color: var(--blue-700); /* Título de CTA en azul oscuro */
-    font-weight: 700;
-}
-
-.call-to-action-section p {
-    font-size: 1.3rem;
     margin-bottom: 40px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    color: var(--gray-600); /* Texto de CTA */
+    position: relative;
+    padding-bottom: 10px;
 }
 
-/* --- Footer --- */
-.main-footer {
-    background-color: var(--blue-700); /* Fondo del footer en azul oscuro */
-    color: var(--white); /* Texto blanco */
-    text-align: center;
-    padding: 30px 20px;
-    font-size: 0.95rem;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Sombra superior */
-}
-
-.main-footer p {
-    margin: 0;
-    opacity: 0.9; /* Ligeramente transparente */
-}
-
-/* --- NUEVOS ESTILOS PARA LA SECCIÓN DE PERFIL (PROFESIONAL Y DINÁMICO) --- */
-.user-profile-section {
-    padding: 80px 20px;
-    background-color: var(--white);
-    text-align: center;
-}
-
-.user-profile-section .section-title {
-    font-size: 2.8rem;
-    margin-bottom: 50px;
-    color: var(--sky-600);
-    font-weight: 700;
-}
-
-.profile-card {
-    background-color: var(--white); /* Fondo blanco, más limpio */
-    border-radius: 15px; /* Bordes más redondeados */
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); /* Sombra más profunda y suave */
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px;
-    text-align: left;
-    border: none; /* Quitamos el borde, la sombra lo define */
-    overflow: hidden; /* Asegura que no haya desbordamiento */
-}
-
-.profile-header {
-    margin-bottom: 35px; /* Más espacio */
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--sky-200); /* Separador más robusto y claro */
-    position: relative; /* Para posibles elementos decorativos */
-}
-
-.profile-header h3 {
-    font-size: 2.4rem; /* Título un poco más grande */
-    color: var(--blue-700);
-    margin-bottom: 0;
-    font-weight: 700; /* Asegurar negrita */
-}
-
-/* Pequeño detalle decorativo en el header del perfil */
-.profile-header::after {
+.section-title::after {
     content: '';
     position: absolute;
-    bottom: -10px; /* Debajo del borde */
-    left: 0;
-    width: 60px; /* Ancho de la línea decorativa */
-    height: 5px;
-    background-color: var(--sky-500); /* Color de la línea */
-    border-radius: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 60px;
+    height: 4px;
+    background-color: #2a609c;
+    border-radius: 2px;
 }
 
+/* User Profile Section */
+.user-profile-section {
+    padding: 60px 0;
+    background-color: #f4f7f6;
+}
+
+.loading-message, .error-message, .success-message, .no-user-message {
+    text-align: center;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 8px;
+    font-size: 1.1em;
+    max-width: 600px;
+}
+
+.loading-message {
+    background-color: #e0f2f7;
+    color: #2196f3;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #f44336;
+    border: 1px solid #f44336;
+}
+
+.success-message {
+    background-color: #e8f5e9;
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.no-user-message {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+/* Profile Card */
+.profile-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.profile-card .profile-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.profile-card .profile-header h3 {
+    margin: 0;
+    color: #2a609c;
+    font-size: 1.8em;
+}
+
+/* Profile Details Grid */
 .profile-details-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Más espacio para los items */
-    gap: 30px; /* Aumento del espaciado entre items */
-    margin-bottom: 45px;
-}
-
-.detail-item {
-    background-color: var(--gray-50); /* Fondo muy claro para cada campo, casi blanco */
-    padding: 20px 25px; /* Más padding */
-    border-radius: 10px; /* Bordes ligeramente más redondeados */
-    border: 1px solid var(--gray-200); /* Borde muy sutil */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Sombra más suave por defecto */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Transiciones mejoradas */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative; /* Para posibles iconos */
-}
-
-.detail-item:hover {
-    border-color: var(--sky-400); /* Borde azul al pasar el ratón */
-    transform: translateY(-5px); /* Elevación más notoria */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada al hover */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .detail-item label {
     display: block;
-    font-size: 0.95rem; /* Un poco más grande */
-    color: var(--gray-600);
-    font-weight: 600;
-    margin-bottom: 10px; /* Más espacio */
-    text-transform: uppercase;
-    letter-spacing: 0.8px; /* Más espacio entre letras */
-    /* Posiblemente un icono aquí */
-    /* &::before { content: '🏠'; margin-right: 8px; font-size: 1.1em; color: var(--sky-500); } */
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    font-size: 0.95em;
 }
 
-.detail-item .detail-value {
-    font-size: 1.25rem; /* Valor más grande y legible */
-    color: var(--gray-800);
-    font-weight: 600; /* Un poco más de negrita */
+.detail-item p.detail-value {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    color: #333;
     margin: 0;
-    line-height: 1.4; /* Mejor legibilidad en varias líneas */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    min-height: 24px;
-}
-
-/* Estilos para el texto de pasaporte que puede ser N/A */
-.detail-item .detail-value.na-text {
-    color: var(--gray-500); /* Color diferente para "N/A" */
-    font-style: italic;
-}
-
-
-.profile-details-grid .full-width {
-    grid-column: 1 / -1;
-}
-
-.profile-actions {
+    min-height: 40px; /* Para mantener la altura consistente */
     display: flex;
-    justify-content: center;
-    gap: 25px; /* Mayor espacio entre botones */
-    flex-wrap: wrap;
-    margin-top: 20px; /* Espacio superior para separar de la grilla */
+    align-items: center;
 }
 
-/* Mensajes de estado (sin cambios significativos) */
-.info-message {
-    padding: 15px 20px;
-    margin-bottom: 25px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-align: center;
-    transition: opacity 0.3s ease;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 1.1rem;
-}
-
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.loading-message, .no-user-message {
-    text-align: center;
-    font-size: 1.2rem;
-    color: var(--gray-600);
-    margin-top: 30px;
-    padding: 20px;
-    background-color: var(--gray-100);
-    border-radius: 8px;
-}
-
-/* Ajustes para inputs si estuvieran en modo edición (mantener) */
 .profile-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid var(--gray-300);
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    color: var(--gray-800);
-    background-color: var(--white);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: calc(100% - 30px); /* Adjust for padding */
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1.1em;
+    color: #333;
+    transition: border-color 0.3s ease;
 }
 
 .profile-input:focus {
     outline: none;
-    border-color: var(--sky-500);
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
+    border-color: #2a609c;
+    box-shadow: 0 0 0 3px rgba(42, 96, 156, 0.2);
 }
 
-.profile-input.disabled-input {
-    background-color: var(--gray-200);
-    color: var(--gray-500);
-    cursor: not-allowed;
-    border: 1px dashed var(--gray-400);
+/* Profile Actions */
+.profile-actions {
+    text-align: right;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 }
 
-/* Ajuste para que los inputs no se "superpongan" a los p cuando no se edita */
-.detail-item p.detail-value[hidden] {
-    display: none;
-}
-.detail-item input[hidden],
-.detail-item select[hidden] {
-    display: none;
+.profile-actions .btn {
+    margin-left: 15px;
 }
 
-/* --- Media Queries para Responsividad (Ajuste para diferentes pantallas) --- */
-@media (max-width: 1024px) {
-    .header-title {
-        font-size: 3.2rem;
-    }
-    .header-subtitle {
-        font-size: 1.4rem;
-    }
-    .features-section h2, .call-to-action-section h2, .user-profile-section .section-title {
-        font-size: 2.5rem;
-    }
-    .profile-header h3 { /* Ajuste del título del perfil */
-        font-size: 2rem;
-    }
-    .detail-item label { /* Ajuste de label de detalle */
-        font-size: 0.9rem;
-    }
-    .detail-item .detail-value { /* Ajuste del valor de detalle */
-        font-size: 1.1rem;
-    }
+/* Buttons */
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
 }
 
-@media (max-width: 768px) {
-    .main-header {
-        height: 450px;
-    }
-    .header-title {
-        font-size: 2.8rem;
-    }
-    .header-subtitle {
-        font-size: 1.3rem;
-    }
-    .btn {
-        padding: 10px 20px;
-        font-size: 1rem;
-    }
-    .features-section h2, .call-to-action-section h2, .user-profile-section .section-title {
-        font-size: 2.2rem;
-    }
-    .feature-item h3 {
-        font-size: 1.6rem;
-    }
-    .feature-item p {
-        font-size: 1rem;
-    }
-    .call-to-action-section p {
-        font-size: 1.1rem;
-    }
-    .profile-card { /* Ajuste de padding de la tarjeta de perfil */
-        padding: 30px;
-    }
-    .profile-header h3 {
-        font-size: 1.8rem;
-    }
-    .profile-details-grid {
-        grid-template-columns: 1fr; /* Una sola columna en móviles */
-        gap: 20px;
-    }
-    .detail-item label {
-        font-size: 0.85rem;
-    }
-    .detail-item .detail-value {
-        font-size: 1.05rem;
-    }
-    .profile-input { /* Ajuste para inputs en móviles */
-        font-size: 0.95rem;
-        padding: 8px;
-    }
-    .profile-header::after { /* Ajuste de la línea decorativa */
-        width: 40px;
-        height: 4px;
-    }
+.btn-primary {
+    background-color: #2a609c;
+    color: #fff;
 }
 
-@media (max-width: 480px) {
-    .main-header {
-        height: 400px;
-    }
-    .header-title {
-        font-size: 2.2rem;
-    }
-    .header-subtitle {
-        font-size: 1.1rem;
-    }
-    .features-section {
-        padding: 60px 20px;
-    }
-    .features-section h2, .call-to-action-section h2, .user-profile-section .section-title {
-        font-size: 1.8rem;
-    }
-    .call-to-action-section {
-        padding: 80px 20px;
-    }
-    .profile-card {
-        padding: 20px;
-    }
-    .profile-header h3 {
-        font-size: 1.6rem;
-    }
-    .profile-actions {
-        flex-direction: column; /* Botones apilados en pantallas muy pequeñas */
-        align-items: center;
-    }
-    .profile-actions .btn {
-        width: 100%; /* Botones de ancho completo */
-        max-width: 250px; /* Limitar el ancho máximo si es necesario */
-    }
-    .profile-input {
-        font-size: 0.9rem;
-        padding: 7px;
-    }
+.btn-primary:hover {
+    background-color: #1e456d;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #2a609c;
+    border: 2px solid #2a609c;
+}
+
+.btn-outline:hover {
+    background-color: #2a609c;
+    color: #fff;
+}
+
+/* Voucher Table Styles */
+.table-responsive {
+    overflow-x: auto; /* Para tablas grandes en pantallas pequeñas */
+    margin-top: 1rem;
+}
+
+.vouchers-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Slightly more rounded corners for the table */
+    overflow: hidden; /* Ensures border-radius applies to contents */
+}
+
+.vouchers-table th,
+.vouchers-table td {
+    padding: 1rem; /* Aumentar el padding para más espacio */
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.vouchers-table th {
+    background-color: #e0eaf3; /* Un tono más claro de azul */
+    color: #2a609c;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que los encabezados se envuelvan si hay poco espacio */
+    padding: 1rem 1.2rem; /* Ligeramente más padding horizontal para los encabezados */
+}
+
+.vouchers-table td {
+    white-space: nowrap; /* Evita que el contenido de las celdas se envuelva */
+    color: #444;
+}
+
+.vouchers-table tbody tr:nth-child(even) {
+    background-color: #f7f9fb; /* Fondo ligeramente diferente para filas pares */
+}
+
+.vouchers-table tbody tr:hover {
+    background-color: #eef3f8; /* Un hover más suave */
+}
+
+/* Footer Styles */
+.main-footer {
+    background-color: #2a609c;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    font-size: 0.9em;
+}
+
+.main-footer .container {
+    padding: 0;
+}
+
+/* Utilities */
+.mt-8 {
+    margin-top: 2rem; /* Mayor margen superior */
 }
